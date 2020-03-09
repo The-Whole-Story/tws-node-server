@@ -4,9 +4,9 @@ const { getArticlesByQuery, getTrendingArticles } = require('../services/newsApi
 
 const router = new express.Router();
 
-router.get('/news/:query', async (req, res) => {
+router.get('/news/trending', async (req, res) => {
     try {
-        const articles = await getArticlesByQuery(req.params.query);
+        const articles = await getTrendingArticles();
         if (articles.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
         } else {
@@ -17,9 +17,9 @@ router.get('/news/:query', async (req, res) => {
     }
 });
 
-router.get('/news/trending', async (req, res) => {
+router.get('/news/:query', async (req, res) => {
     try {
-        const articles = await getTrendingArticles();
+        const articles = await getArticlesByQuery(req.params.query);
         if (articles.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
         } else {
