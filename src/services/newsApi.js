@@ -13,7 +13,7 @@ const getArticlesByQuery = async (query) => {
 const getTrendingArticles = async () => {
     const sources = 'bbc-news,the-wall-street-journal,the-washington-post'; 
     //economist does not have a source id listed with the news api, so we cannot access it here
-    const url = `http://newsapi.org/v2/top-headlines?sources=${sources},&apiKey=${newsKey}`;
+    const url = `http://newsapi.org/v2/top-headlines?sources=${sources}&apiKey=${newsKey}&pageSize=3`;
 
 
     return (await axios.get(url, { params: {}, headers: { Authorization: newsKey } })).data.articles;
