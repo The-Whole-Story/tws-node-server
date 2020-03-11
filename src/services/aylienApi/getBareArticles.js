@@ -27,7 +27,7 @@ const getBareArticles = async (query) => {
                     let obj = {
                         storyId: story.id,
                         title: story.title,
-                        author: story.author,
+                        author: story.author.name,
                         body: story.body,
                         source: {
                             name: story.source.name,
