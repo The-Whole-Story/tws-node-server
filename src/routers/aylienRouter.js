@@ -1,13 +1,14 @@
 const express = require('express');
 
-const { getBareArticles } = require('../services/aylienApi/getBareArticles');
-const { getEntities } = require('../services/aylienApi/getEntities');
+const { getBareArticlesByQuery } = require('../services/aylienApi/getBareArticles');
+const { getEntitiesByQuery } = require('../services/aylienApi/getEntities');
+const { getPositiveNews } = require('../services/aylienApi/getPositve');
 
 const router = new express.Router();
 
 router.get('/articles/:query', async (req, res) => {
     try {
-        articles = await getBareArticles(req.params.query);
+        const articles = await getBareArticlesByQuery(req.params.query);
 
         if (articles.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
@@ -21,7 +22,7 @@ router.get('/articles/:query', async (req, res) => {
 
 router.get('/entities/:query', async (req, res) => {
     try {
-        entities = await getEntities(req.params.query);
+        const entities = await getEntitiesByQuery(req.params.query);
 
         if (entities.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
@@ -29,6 +30,21 @@ router.get('/entities/:query', async (req, res) => {
             res.status(200).send(entities);
         }
     } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+router.get('/positive/:query', async (req, res) => {
+    try {
+        const positiveArticles = await getPositiveNews(req.params.query);
+
+        if (positiveArticles.length === 0) {
+            res.status(404).send({ error: 'search brought no results' });
+        } else {
+            res.status(200).send(positiveArticles);
+        }
+    } catch (err) {
+        console.log(err);
         res.status(400).send(err);
     }
 });
