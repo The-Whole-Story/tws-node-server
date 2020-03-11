@@ -8,7 +8,6 @@ const app = express();
 const PORT = process.env.PORT || 9000;
 
 app.use(express.json());
-// app.use(newsRouter);
 app.use(wikiRouter);
 app.use(aylienRouter);
 
