@@ -11,7 +11,7 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getPositiveNews = async (query) => {
+const getPositiveNews = async (query, nArticles) => {
     let search = query.replace(' ', '&&').replace('%20', '&&');
     const opts = {
         text: `${search}`,
@@ -19,7 +19,7 @@ const getPositiveNews = async (query) => {
         notSentimentTitlePolarity: 'negative',
         language: ['en'],
         sort_by: 'hotness',
-        perPage: 10
+        perPage: 100
     };
 
     return await new Promise((resolve, reject) => {
@@ -52,7 +52,7 @@ const getPositiveNews = async (query) => {
                     return 0;
                 });
 
-                const mostPositiveArticles = positiveArticles.slice(0, 3);
+                const mostPositiveArticles = positiveArticles.slice(0, parseInt(nArticles));
 
                 resolve(mostPositiveArticles);
             } catch (err) {

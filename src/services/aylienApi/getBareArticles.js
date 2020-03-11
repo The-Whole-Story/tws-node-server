@@ -11,13 +11,13 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getBareArticlesByQuery = async (query) => {
+const getBareArticlesByQuery = async (query, nArticles) => {
     let search = query.replace(' ', '&&').replace('%20', '&&');
     const opts = {
         language: ['en'],
         text: `${search}`,
         sort_by: 'published_at',
-        perPage: 20
+        perPage: nArticles
     };
 
     return await new Promise((resolve, reject) => {
