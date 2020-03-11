@@ -20,29 +20,78 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getArticles = async (query) => {
+const getBareArticles = async (query) => {
+    let search = query.replace(' ', '&&');
     const opts = {
         language: ['en'],
-        text: `${query}`,
+        text: `${search}`,
         sort_by: 'published_at',
         perPage: 20
     };
 
-    let articles = [];
-
-    await new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
-                articles.push(data.stories);
-                resolve();
+                let bareArticles = data.stories.map((story) => {
+                    let obj = {
+                        storyId: story.id,
+                        title: story.title,
+                        author: story.author,
+                        body: story.body,
+                        source: {
+                            name: story.source.name,
+                            domain: story.source.domain
+                        },
+                        url: story.links.permalink,
+                        keywords: story.keywords
+                    };
+                    return obj;
+                });
+
+                resolve(bareArticles);
             } catch (err) {
-                throw new Error(err);
+                reject(err);
             }
         });
     });
-    return articles;
+};
+
+const getEntities = async (query) => {
+    let search = query.replace(' ', '&&');
+
+    const opts = {
+        language: ['en'],
+        text: `${search}`,
+        sort_by: 'published_at',
+        perPage: 20
+    };
+
+    let entities = {};
+
+    return await new Promise((resolve, reject) => {
+        apiInstance.listStories(opts, (error, data, response) => {
+            try {
+                data.stories.forEach((story) => {
+                    story.entities.body.forEach((elem) => {
+                        if (!(elem.text in entities)) {
+                            entities[elem.text] = 1;
+                        } else {
+                            entities[elem.text]++;
+                        }
+                    });
+                });
+                entities = Object.keys(entities).filter((entity) => entities[entity] > 1);
+                //only returns the entities that occur more than once
+
+                resolve(entities);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    });
 };
 
 module.exports = {
-    getArticles: getArticles
+    getBareArticles: getBareArticles,
+    getEntities: getEntities
 };
