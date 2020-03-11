@@ -1,6 +1,7 @@
 const express = require('express');
 
-const { getBareArticles, getEntities } = require('../services/aylienApi');
+const { getBareArticles } = require('../services/aylienApi/getBareArticles');
+const { getEntities } = require('../services/aylienApi/getEntities');
 
 const router = new express.Router();
 
