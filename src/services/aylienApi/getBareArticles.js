@@ -11,7 +11,7 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getBareArticles = async (query) => {
+const getBareArticlesByQuery = async (query) => {
     let search = query.replace(' ', '&&');
     const opts = {
         language: ['en'],
@@ -48,5 +48,5 @@ const getBareArticles = async (query) => {
 };
 
 module.exports = {
-    getBareArticles: getBareArticles,
+    getBareArticlesByQuery: getBareArticlesByQuery,
 };
