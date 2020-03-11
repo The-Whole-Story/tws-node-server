@@ -1,12 +1,13 @@
 const express = require('express');
 
-const { getArticlesByQuery, getTrendingArticles } = require('../services/newsApi');
+const { getBareArticles, getEntities } = require('../services/aylienApi');
 
 const router = new express.Router();
 
-router.get('/news/trending', async (req, res) => {
+router.get('/articles/:query', async (req, res) => {
     try {
-        const articles = await getTrendingArticles();
+        articles = await getBareArticles(req.params.query);
+
         if (articles.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
         } else {
@@ -17,13 +18,14 @@ router.get('/news/trending', async (req, res) => {
     }
 });
 
-router.get('/news/:query', async (req, res) => {
+router.get('/entities/:query', async (req, res) => {
     try {
-        const articles = await getArticlesByQuery(req.params.query);
-        if (articles.length === 0) {
+        entities = await getEntities(req.params.query);
+
+        if (entities.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
         } else {
-            res.status(200).send(articles);
+            res.status(200).send(entities);
         }
     } catch (err) {
         res.status(400).send(err);
@@ -31,5 +33,5 @@ router.get('/news/:query', async (req, res) => {
 });
 
 module.exports = {
-    newsRouter: router
+    aylienRouter: router
 };
