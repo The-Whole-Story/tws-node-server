@@ -34,6 +34,21 @@ router.get('/entities/:query', async (req, res) => {
     }
 });
 
+router.get('/positive/:query', async (req, res) => {
+    try {
+        const positiveArticles = await getPositiveNews(req.params.query);
+
+        if (positiveArticles.length === 0) {
+            res.status(404).send({ error: 'search brought no results' });
+        } else {
+            res.status(200).send(positiveArticles);
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(400).send(err);
+    }
+});
+
 module.exports = {
     aylienRouter: router
 };

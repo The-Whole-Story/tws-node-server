@@ -11,19 +11,21 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getBareArticlesByQuery = async (query) => {
+const getPositiveNews = async (query) => {
     let search = query.replace(' ', '&&').replace('%20', '&&');
     const opts = {
-        language: ['en'],
         text: `${search}`,
-        sort_by: 'published_at',
-        perPage: 20
+        sentimentBodyPolarity: 'positive',
+        notSentimentTitlePolarity: 'negative',
+        language: ['en'],
+        sort_by: 'hotness',
+        perPage: 10
     };
 
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
-                let bareArticles = data.stories.map((story) => {
+                let positiveArticles = data.stories.map((story) => {
                     let obj = {
                         storyId: story.id,
                         title: story.title,
@@ -34,12 +36,25 @@ const getBareArticlesByQuery = async (query) => {
                             domain: story.source.domain
                         },
                         url: story.links.permalink,
-                        keywords: story.keywords
+                        keywords: story.keywords,
+                        sentiment: story.sentiment.body.score //note, sentiment here is always positive because it was specified in the api call
                     };
                     return obj;
                 });
 
-                resolve(bareArticles);
+                positiveArticles.sort((a, b) => {
+                    if (a.sentiment > b.sentiment) {
+                        return -1;
+                    }
+                    if (a.sentiment < b.sentiment) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                const mostPositiveArticles = positiveArticles.slice(0, 3);
+
+                resolve(mostPositiveArticles);
             } catch (err) {
                 reject(err);
             }
@@ -48,5 +63,5 @@ const getBareArticlesByQuery = async (query) => {
 };
 
 module.exports = {
-    getBareArticlesByQuery: getBareArticlesByQuery
+    getPositiveNews: getPositiveNews
 };
