@@ -23,9 +23,9 @@ router.get('/articles/:query/:nArticles', async (req, res) => {
     }
 });
 
-router.get('/entities/:query', async (req, res) => {
+router.get('/entities/:query/:nEntities', async (req, res) => {
     try {
-        const entities = await getEntitiesByQuery(req.params.query);
+        const entities = await getEntitiesByQuery(req.params.query, req.params.nEntities);
 
         if (entities.length === 0) {
             res.status(404).send({ error: 'search brought no results' });

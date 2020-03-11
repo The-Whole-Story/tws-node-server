@@ -11,14 +11,15 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getEntitiesByQuery = async (query) => {
+const getEntitiesByQuery = async (query, nEntities) => {
     let search = query.replace(' ', '&&');
 
+    const entitiesToAvoid = [...query.toLowerCase().split(' '), 'us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal'];
     const opts = {
         language: ['en'],
         text: `${search}`,
-        sort_by: 'published_at',
-        perPage: 20
+        sort_by: 'hotness',
+        perPage: 100
     };
 
     let entities = {};
@@ -28,17 +29,30 @@ const getEntitiesByQuery = async (query) => {
             try {
                 data.stories.forEach((story) => {
                     story.entities.body.forEach((elem) => {
-                        if (!(elem.text in entities)) {
-                            entities[elem.text] = 1;
-                        } else {
-                            entities[elem.text]++;
+                        // console.log(elem.text.split(' '))
+                        if (!elem.text.split(' ').some((word) => entitiesToAvoid.indexOf(word.toLowerCase()) >= 0)) {
+                            //if an individual word in a keyword element is in the entitiesToAvoid array, then do not add it to the entities
+                            entities[elem.text.toLowerCase()] === undefined ? (entities[elem.text] = 1) : entities[elem.text]++;
                         }
                     });
                 });
-                entities = Object.keys(entities).filter((entity) => entities[entity] > 1);
-                //only returns the entities that occur more than once
 
-                resolve(entities);
+                let entityNames = Object.keys(entities);
+                entityNames.sort((a, b) => {
+                    if (entities[a] > entities[b]) {
+                        //if the entity at a has more occurances, put a first
+                        return -1;
+                    }
+                    if (entities[a] < entities[b]) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                if(entityNames.length < nEntities){
+                    resolve(entityNames.slice(0,entityNames.length))
+                }
+                resolve(entityNames.slice(0,nEntities));
             } catch (err) {
                 reject(err);
             }
