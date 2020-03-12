@@ -3,6 +3,7 @@ const express = require('express');
 const { getArticles } = require('../services/aylienApi/getArticles');
 const { getEntities } = require('../services/aylienApi/getEntities');
 const { getPositiveNews } = require('../services/aylienApi/getPositve');
+const { getLocalNews } = require('../services/aylienApi/getLocal');
 
 const router = new express.Router();
 
@@ -60,6 +61,20 @@ router.get('/positive/:query/:nArticles', async (req, res) => {
             res.status(404).send({ error: 'search brought no results' });
         } else {
             res.status(200).send(positiveArticles);
+        }
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+router.get('/local', async (req, res) => {
+    try {
+        const articles = await getLocalNews(req.body.lat, req.body.long);
+
+        if (articles.length === 0) {
+            res.status(404).send({ error: 'search brought no results' });
+        } else {
+            res.status(200).send(articles);
         }
     } catch (err) {
         res.status(400).send(err);
