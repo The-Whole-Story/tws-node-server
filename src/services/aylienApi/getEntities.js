@@ -11,16 +11,20 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getEntitiesByQuery = async (query, nEntities) => {
-    let search = query.replace(' ', '&&');
-
-    const entitiesToAvoid = [...query.toLowerCase().split(' '), 'us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal'];
+const getEntities = async (options, nEntities) => {
     const opts = {
         language: ['en'],
-        text: `${search}`,
-        sort_by: 'hotness',
+        sort_by: 'recency',
         perPage: 100
     };
+
+    Object.keys(options).forEach((key) => (opts[key] = options[key]));
+
+    let entitiesToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal'];
+
+    if ('text' in options) {
+        entitiesToAvoid = [...entitiesToAvoid, ...options.text.toLowerCase().split(' ')];
+    }
 
     let entities = {};
 
@@ -29,10 +33,11 @@ const getEntitiesByQuery = async (query, nEntities) => {
             try {
                 data.stories.forEach((story) => {
                     story.entities.body.forEach((elem) => {
-                        // console.log(elem.text.split(' '))
+                        //if an individual word in a keyword element is in the entitiesToAvoid array, then do not add it to the entities array
                         if (!elem.text.split(' ').some((word) => entitiesToAvoid.indexOf(word.toLowerCase()) >= 0)) {
-                            //if an individual word in a keyword element is in the entitiesToAvoid array, then do not add it to the entities
-                            entities[elem.text.toLowerCase()] === undefined ? (entities[elem.text] = 1) : entities[elem.text]++;
+                            entities[elem.text.toLowerCase()] === undefined
+                                ? (entities[elem.text.toLowerCase()] = 1)
+                                : entities[elem.text.toLowerCase()]++;
                         }
                     });
                 });
@@ -49,10 +54,10 @@ const getEntitiesByQuery = async (query, nEntities) => {
                     return 0;
                 });
 
-                if(entityNames.length < nEntities){
-                    resolve(entityNames.slice(0,entityNames.length))
+                if (entityNames.length < nEntities) {
+                    resolve(entityNames);
                 }
-                resolve(entityNames.slice(0,nEntities));
+                resolve(entityNames.slice(0, nEntities));
             } catch (err) {
                 reject(err);
             }
@@ -61,5 +66,5 @@ const getEntitiesByQuery = async (query, nEntities) => {
 };
 
 module.exports = {
-    getEntitiesByQuery: getEntitiesByQuery
+    getEntities: getEntities
 };
