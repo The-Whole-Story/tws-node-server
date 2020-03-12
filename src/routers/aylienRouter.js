@@ -4,6 +4,7 @@ const { getBareArticlesByQuery } = require('../services/aylienApi/getBareArticle
 const { getEntitiesByQuery } = require('../services/aylienApi/getEntities');
 const { getPositiveNews } = require('../services/aylienApi/getPositve');
 const { getPoliticalArticles } = require('../services/aylienApi/getPoliticalArticles');
+const { getPoliticalEntities } = require('../services/aylienApi/getPoliticalEntities');
 
 const router = new express.Router();
 
@@ -55,7 +56,7 @@ router.get('/positive/:query/:nArticles', async (req, res) => {
     }
 });
 
-router.get('/politicalEntities/:nEnitites', async (req, res) => {
+router.get('/politicalEntities/:nEntities', async (req, res) => {
     try {
         if (req.params.nEntities < 1) {
             throw new Error('nEntities must be greater than 0');
@@ -68,6 +69,7 @@ router.get('/politicalEntities/:nEnitites', async (req, res) => {
             res.status(200).send(politicalEntities);
         }
     } catch (err) {
+        console.log(err);
         res.status(400).send(err);
     }
 });
