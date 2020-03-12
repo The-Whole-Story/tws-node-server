@@ -16,7 +16,7 @@ const getBareArticlesByQuery = async (query, nArticles) => {
     const opts = {
         language: ['en'],
         text: `${search}`,
-        sort_by: 'published_at',
+        sort_by: 'recency',
         perPage: nArticles
     };
 

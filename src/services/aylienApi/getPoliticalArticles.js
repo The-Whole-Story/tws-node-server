@@ -14,7 +14,7 @@ const apiInstance = new AylienNewsApi.DefaultApi();
 const getPoliticalArticles = async (nArticles) => {
     const opts = {
         language: ['en'],
-        sort_by: 'hotness',
+        sort_by: 'recency',
         categoriesTaxonomy: 'iptc-subjectcode',
         categoriesId: ['06004000', '11000000', '11024000'],
         perPage: nArticles
