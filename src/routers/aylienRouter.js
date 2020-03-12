@@ -55,6 +55,23 @@ router.get('/positive/:query/:nArticles', async (req, res) => {
     }
 });
 
+router.get('/politicalEntities/:nEnitites', async (req, res) => {
+    try {
+        if (req.params.nEntities < 1) {
+            throw new Error('nEntities must be greater than 0');
+        }
+        const politicalEntities = await getPoliticalEntities(req.params.nEntities);
+
+        if (politicalEntities.length === 0) {
+            res.status(400).send({ error: 'search brought no results' });
+        } else {
+            res.status(200).send(politicalEntities);
+        }
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
 router.get('/politics/:nArticles', async (req, res) => {
     try {
         const politicalArticles = await getPoliticalArticles(req.params.nArticles);
