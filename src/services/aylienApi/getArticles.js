@@ -11,19 +11,18 @@ app_key.apiKey = aylienKey;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getPoliticalArticles = async (nArticles) => {
-    const opts = {
+const getArticles = async (options) => {
+    let opts = {
         language: ['en'],
-        sort_by: 'recency',
-        categoriesTaxonomy: 'iptc-subjectcode',
-        categoriesId: ['06004000', '11000000', '11024000'],
-        perPage: nArticles
+        sort_by: 'recency'
     };
+
+    Object.keys(options).forEach((key) => (opts[key] = options[key]));
 
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
-                let politicalArticles = data.stories.map((story) => {
+                let articles = data.stories.map((story) => {
                     let obj = {
                         storyId: story.id,
                         title: story.title,
@@ -39,7 +38,7 @@ const getPoliticalArticles = async (nArticles) => {
                     return obj;
                 });
 
-                resolve(politicalArticles);
+                resolve(articles);
             } catch (err) {
                 reject(err);
             }
@@ -48,5 +47,5 @@ const getPoliticalArticles = async (nArticles) => {
 };
 
 module.exports = {
-    getPoliticalArticles: getPoliticalArticles
+    getArticles: getArticles
 };
