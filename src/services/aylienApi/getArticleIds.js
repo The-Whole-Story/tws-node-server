@@ -1,6 +1,6 @@
 const AylienNewsApi = require('aylien-news-api');
 const dotenv = require('dotenv');
-dotenv.config()
+dotenv.config();
 
 const defaultClient = AylienNewsApi.ApiClient.instance;
 
@@ -12,7 +12,7 @@ app_key.apiKey = process.env.AYLIEN_KEY;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getArticles = async (options) => {
+const getArticleIds = async (options) => {
     let opts = {
         language: ['en'],
         sort_by: 'recency'
@@ -23,24 +23,9 @@ const getArticles = async (options) => {
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
-                let articles = data.stories.map((story) => {
-                    let obj = {
-                        articleId: story.id,
-                        title: story.title,
-                        author: story.author.name,
-                        body: story.body,
-                        source: {
-                            name: story.source.name,
-                            domain: story.source.domain
-                        },
-                        url: story.links.permalink,
-                        keywords: story.keywords
-                    };
-                    return obj;
-                });
-
-                resolve(articles);
-            } catch (err) {
+                const articleIds = data.stories.map((story) => story.id);
+                resolve(articleIds);
+            } catch (errr) {
                 reject(err);
             }
         });
@@ -48,5 +33,5 @@ const getArticles = async (options) => {
 };
 
 module.exports = {
-    getArticles: getArticles
+    getArticleIds: getArticleIds
 };

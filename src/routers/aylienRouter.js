@@ -1,6 +1,7 @@
 const express = require('express');
 
-const { getArticles } = require('../services/aylienApi/getArticles');
+const { getArticleIds } = require('../services/aylienApi/getArticleIds');
+const { getArticlesById } = require('../services/aylienApi/getArticlesById');
 const { getEntities } = require('../services/aylienApi/getEntities');
 const { getPositiveNews } = require('../services/aylienApi/getPositve');
 const { getLocalNews } = require('../services/aylienApi/getLocal');
@@ -9,7 +10,7 @@ const { auth } = require('../middleware/auth');
 
 const router = new express.Router();
 
-router.get('/articles/:query/:nArticles', auth, async (req, res) => {
+router.get('/articleIds/:query/:nArticles', auth, async (req, res) => {
     try {
         if (parseInt(req.params.nArticles) < 1 || parseInt(req.params.nArticles) > 100) {
             throw new Error('nArticles must be within 1 and 100, both inclusive');
@@ -18,8 +19,28 @@ router.get('/articles/:query/:nArticles', auth, async (req, res) => {
             text: req.params.query,
             perPage: req.params.nArticles
         };
-        const articles = await getArticles(options);
+        const articleIds = await getArticleIds(options);
 
+        if (articleIds.length === 0) {
+            res.status(404).send({ error: 'search brought no results' });
+        } else {
+            res.status(200).send(articleIds);
+        }
+    } catch (err) {
+        res.status(400).send(err);
+    }
+});
+
+router.get('/articlesById/', auth, async (req, res) => {
+    try {
+        if (req.body.length < 1 || req.body.length > 100) {
+            throw new Error('nArticles must be within 1 and 100, both inclusive');
+        }
+        let opts = {
+            id: req.body,
+            perPage: req.body.length
+        };
+        const articles = await getArticlesById(opts);
         if (articles.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
         } else {
