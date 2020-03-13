@@ -1,13 +1,16 @@
 const AylienNewsApi = require('aylien-news-api');
 const { aylienKey, aylienAppId } = require('../../../config');
 
+const key = process.env.AYLIEN_KEY || aylienKey;
+const appId = process.env.AYLIEN_APP_ID || aylienAppId;
+
 const defaultClient = AylienNewsApi.ApiClient.instance;
 
 const app_id = defaultClient.authentications['app_id'];
-app_id.apiKey = aylienAppId;
+app_id.apiKey = appId;
 
 const app_key = defaultClient.authentications['app_key'];
-app_key.apiKey = aylienKey;
+app_key.apiKey = key;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
