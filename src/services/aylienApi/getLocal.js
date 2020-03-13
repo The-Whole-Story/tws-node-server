@@ -1,6 +1,7 @@
 const AylienNewsApi = require('aylien-news-api');
+const reverse = require('reverse-geocode');
 const dotenv = require('dotenv');
-dotenv.config()
+dotenv.config();
 
 const defaultClient = AylienNewsApi.ApiClient.instance;
 
