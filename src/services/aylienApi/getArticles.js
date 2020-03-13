@@ -25,7 +25,7 @@ const getArticles = async (options) => {
             try {
                 let articles = data.stories.map((story) => {
                     let obj = {
-                        storyId: story.id,
+                        articleId: story.id,
                         title: story.title,
                         author: story.author.name,
                         body: story.body,
