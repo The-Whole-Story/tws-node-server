@@ -5,9 +5,11 @@ const { getEntities } = require('../services/aylienApi/getEntities');
 const { getPositiveNews } = require('../services/aylienApi/getPositve');
 const { getLocalNews } = require('../services/aylienApi/getLocal');
 
+const { auth } = require('../middleware/auth');
+
 const router = new express.Router();
 
-router.get('/articles/:query/:nArticles', async (req, res) => {
+router.get('/articles/:query/:nArticles', auth, async (req, res) => {
     try {
         if (parseInt(req.params.nArticles) < 1 || parseInt(req.params.nArticles) > 100) {
             throw new Error('nArticles must be within 1 and 100, both inclusive');
@@ -28,7 +30,7 @@ router.get('/articles/:query/:nArticles', async (req, res) => {
     }
 });
 
-router.get('/politics/:nArticles', async (req, res) => {
+router.get('/politics/:nArticles', auth, async (req, res) => {
     try {
         if (parseInt(req.params.nArticles) < 1 || parseInt(req.params.nArticles) > 100) {
             throw new Error('nArticles must be within 1 and 100, both inclusive');
@@ -50,7 +52,7 @@ router.get('/politics/:nArticles', async (req, res) => {
     }
 });
 
-router.get('/positive/:query/:nArticles', async (req, res) => {
+router.get('/positive/:query/:nArticles', auth, async (req, res) => {
     try {
         if (parseInt(req.params.nArticles) < 1 || parseInt(req.params.nArticles) > 100) {
             throw new Error('nArticles must be within 1 and 100, both inclusive');
@@ -67,7 +69,7 @@ router.get('/positive/:query/:nArticles', async (req, res) => {
     }
 });
 
-router.get('/local', async (req, res) => {
+router.get('/local', auth, async (req, res) => {
     try {
         const articles = await getLocalNews(req.body.lat, req.body.long);
 
@@ -81,7 +83,7 @@ router.get('/local', async (req, res) => {
     }
 });
 
-router.get('/entities/:query/:nEntities', async (req, res) => {
+router.get('/entities/:query/:nEntities', auth, async (req, res) => {
     try {
         if (req.params.nEntities < 1) {
             throw new Error('nEntities must be greater than 0');
@@ -101,7 +103,7 @@ router.get('/entities/:query/:nEntities', async (req, res) => {
     }
 });
 
-router.get('/politicalEntities/:nEntities', async (req, res) => {
+router.get('/politicalEntities/:nEntities', auth, async (req, res) => {
     try {
         if (req.params.nEntities < 1) {
             throw new Error('nEntities must be greater than 0');
