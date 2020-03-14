@@ -8,7 +8,7 @@ const { auth } = require('../middleware/auth');
 
 const router = new express.Router();
 
-router.get('/articleIds', auth, async (req, res) => {
+router.post('/articleIds', auth, async (req, res) => {
     try {
         const articleIds = await getArticleIds(req.body);
 
@@ -22,7 +22,7 @@ router.get('/articleIds', auth, async (req, res) => {
     }
 });
 
-router.get('/articlesById', auth, async (req, res) => {
+router.post('/articlesById', auth, async (req, res) => {
     try {
         if (req.body.length < 1 || req.body.length > 100) {
             throw new Error('nArticles must be within 1 and 100, both inclusive');
@@ -42,7 +42,7 @@ router.get('/articlesById', auth, async (req, res) => {
     }
 });
 
-router.get('/subtopics', auth, async (req, res) => {
+router.post('/subtopics', auth, async (req, res) => {
     try {
         const subtopics = await getSubtopics(req.body);
 
