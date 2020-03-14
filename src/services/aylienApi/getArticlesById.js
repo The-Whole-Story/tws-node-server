@@ -12,13 +12,13 @@ app_key.apiKey = process.env.AYLIEN_KEY;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getArticlesById = async (options) => {
+const getArticlesById = async (ids) => {
     let opts = {
         language: ['en'],
-        sort_by: 'recency'
+        sort_by: 'recency',
+        id: ids,
+        perPage: ids.length
     };
-
-    Object.keys(options).forEach((key) => (opts[key] = options[key]));
 
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
@@ -35,7 +35,7 @@ const getArticlesById = async (options) => {
                         },
                         url: story.links.permalink,
                         publishedAt: story.published_at,
-                        keywords: story.keywords,
+                        keywords: story.keywords
                     };
                     return obj;
                 });
