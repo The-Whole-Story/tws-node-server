@@ -1,6 +1,6 @@
 const AylienNewsApi = require('aylien-news-api');
 const dotenv = require('dotenv');
-dotenv.config()
+dotenv.config();
 
 const defaultClient = AylienNewsApi.ApiClient.instance;
 
@@ -12,19 +12,34 @@ app_key.apiKey = process.env.AYLIEN_KEY;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getEntities = async (options, nEntities) => {
-    const opts = {
+const getEntities = async (options) => {
+    let opts = {
         language: ['en'],
-        sort_by: 'recency',
-        perPage: 100
+        sort_by: 'recency'
     };
-
-    Object.keys(options).forEach((key) => (opts[key] = options[key]));
 
     let entitiesToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal'];
 
-    if ('text' in options) {
-        entitiesToAvoid = [...entitiesToAvoid, ...options.text.toLowerCase().split(' ')];
+    if (options.nEntities === undefined || options.nEntities < 1) {
+        throw new Error('nEntities must be > 0');
+    } else {
+        opts.perPage = options.nEntities;
+    }
+
+    if (options.query !== undefined) {
+        opts.text = options.query;
+        entitiesToAvoid = [...entitiesToAvoid, ...options.query.toLowerCase().split(' ')];
+    }
+
+    if (options.filter !== undefined) {
+        //if there is a filter provided
+        if (options.filter.toLowerCase() === 'positive') {
+            opts.sentimentBodyPolarity = 'positive';
+            opts.notSentimentTitlePolarity = 'negative';
+        } else if (options.filter.toLowerCase() === 'political') {
+            opts.categoriesTaxonomy = 'iptc-subjectcode';
+            opts.categoriesId = ['06004000', '11000000', '11024000'];
+        }
     }
 
     let entities = {};
@@ -55,10 +70,10 @@ const getEntities = async (options, nEntities) => {
                     return 0;
                 });
 
-                if (entityNames.length < nEntities) {
+                if (entityNames.length < options.nEntities) {
                     resolve(entityNames);
                 }
-                resolve(entityNames.slice(0, nEntities));
+                resolve(entityNames.slice(0, options.nEntities));
             } catch (err) {
                 reject(err);
             }

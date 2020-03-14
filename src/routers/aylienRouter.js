@@ -18,7 +18,6 @@ router.get('/articleIds', auth, async (req, res) => {
             res.status(200).send(articleIds);
         }
     } catch (err) {
-        console.log(err);
         res.status(400).send(err);
     }
 });
@@ -43,36 +42,9 @@ router.get('/articlesById', auth, async (req, res) => {
     }
 });
 
-router.get('/entities/:query/:nEntities', auth, async (req, res) => {
+router.get('/entities', auth, async (req, res) => {
     try {
-        if (req.params.nEntities < 1) {
-            throw new Error('nEntities must be greater than 0');
-        }
-        let options = {
-            text: req.params.query
-        };
-        const entities = await getEntities(options, req.params.nEntities);
-
-        if (entities.length === 0) {
-            res.status(404).send({ error: 'search brought no results' });
-        } else {
-            res.status(200).send(entities);
-        }
-    } catch (err) {
-        res.status(400).send(err);
-    }
-});
-
-router.get('/politicalEntities/:nEntities', auth, async (req, res) => {
-    try {
-        if (req.params.nEntities < 1) {
-            throw new Error('nEntities must be greater than 0');
-        }
-        let options = {
-            categoriesTaxonomy: 'iptc-subjectcode',
-            categoriesId: ['06004000', '11000000', '11024000']
-        };
-        const entities = await getEntities(options, req.params.nEntities);
+        const entities = await getEntities(req.body);
 
         if (entities.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
