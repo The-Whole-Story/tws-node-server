@@ -35,7 +35,7 @@ const getArticlesById = async (options) => {
                         },
                         url: story.links.permalink,
                         publishedAt: story.published_at,
-                        keywords: story.keywords
+                        keywords: story.keywords,
                     };
                     return obj;
                 });
