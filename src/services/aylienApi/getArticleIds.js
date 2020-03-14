@@ -38,7 +38,7 @@ const getArticleIds = async (options) => {
         opts.perPage = options.nResults;
     }
     if (options.query !== undefined) {
-        opts.text = options.query;
+        opts.text = options.query.replace(' ', '&&');
     }
     if (options.filter !== undefined) {
         //if there is a filter provided
