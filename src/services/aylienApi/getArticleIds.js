@@ -32,10 +32,10 @@ const getArticleIds = async (options) => {
         sort_by: 'recency'
     };
 
-    if (options.nArticles === undefined || options.nArticles < 1 || options.nArticles > 100) {
-        throw new Error('nArticles must be within 1 and 100, both inclusive');
+    if (options.nResults === undefined || options.nResults < 1 || options.nResults > 100) {
+        throw new Error('nResults must be within 1 and 100, both inclusive');
     } else {
-        opts.perPage = options.nArticles;
+        opts.perPage = options.nResults;
     }
     if (options.query !== undefined) {
         opts.text = options.query;

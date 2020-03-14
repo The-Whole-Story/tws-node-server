@@ -24,9 +24,6 @@ router.post('/articleIds', auth, async (req, res) => {
 
 router.post('/articlesById', auth, async (req, res) => {
     try {
-        if (req.body.ids.length < 1 || req.body.ids.length > 100) {
-            throw new Error('nArticles must be within 1 and 100, both inclusive');
-        }
         const articles = await getArticlesById(req.body.ids);
         if (articles.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
