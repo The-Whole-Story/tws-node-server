@@ -34,6 +34,7 @@ const getArticlesById = async (options) => {
                             domain: story.source.domain
                         },
                         url: story.links.permalink,
+                        publishedAt: story.published_at,
                         keywords: story.keywords
                     };
                     return obj;
