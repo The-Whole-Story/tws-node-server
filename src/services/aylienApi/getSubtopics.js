@@ -12,23 +12,23 @@ app_key.apiKey = process.env.AYLIEN_KEY;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
-const getEntities = async (options) => {
+const getSubtopics = async (options) => {
     let opts = {
         language: ['en'],
         sort_by: 'recency'
     };
 
-    let entitiesToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal'];
+    let subtopicsToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal'];
 
-    if (options.nEntities === undefined || options.nEntities < 1) {
-        throw new Error('nEntities must be > 0');
+    if (options.nSubtopics === undefined || options.nSubtopics < 1) {
+        throw new Error('nSubtopics must be > 0');
     } else {
-        opts.perPage = options.nEntities;
+        opts.perPage = options.nSubtopics;
     }
 
-    if (options.query !== undefined) {
-        opts.text = options.query;
-        entitiesToAvoid = [...entitiesToAvoid, ...options.query.toLowerCase().split(' ')];
+    if (options.topic !== undefined) {
+        opts.text = options.topic;
+        subtopicsToAvoid = [...subtopicsToAvoid, ...options.topic.toLowerCase().split(' ')];
     }
 
     if (options.filter !== undefined) {
@@ -42,38 +42,38 @@ const getEntities = async (options) => {
         }
     }
 
-    let entities = {};
+    let subtopics = {};
 
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
                 data.stories.forEach((story) => {
                     story.entities.body.forEach((elem) => {
-                        //if an individual word in a keyword element is in the entitiesToAvoid array, then do not add it to the entities array
-                        if (!elem.text.split(' ').some((word) => entitiesToAvoid.indexOf(word.toLowerCase()) >= 0)) {
-                            entities[elem.text.toLowerCase()] === undefined
-                                ? (entities[elem.text.toLowerCase()] = 1)
-                                : entities[elem.text.toLowerCase()]++;
+                        //if an individual word in a keyword element is in the subtopicsToAvoid array, then do not add it to the subtopic array
+                        if (!elem.text.split(' ').some((word) => subtopicsToAvoid.indexOf(word.toLowerCase()) >= 0)) {
+                            subtopics[elem.text.toLowerCase()] === undefined
+                                ? (subtopics[elem.text.toLowerCase()] = 1)
+                                : subtopics[elem.text.toLowerCase()]++;
                         }
                     });
                 });
 
-                let entityNames = Object.keys(entities);
-                entityNames.sort((a, b) => {
-                    if (entities[a] > entities[b]) {
-                        //if the entity at a has more occurances, put a first
+                let subtopicNames = Object.keys(subtopics);
+                subtopicNames.sort((a, b) => {
+                    if (subtopics[a] > subtopics[b]) {
+                        //if the subtopic at a has more occurances, put a first
                         return -1;
                     }
-                    if (entities[a] < entities[b]) {
+                    if (subtopics[a] < subtopics[b]) {
                         return 1;
                     }
                     return 0;
                 });
 
-                if (entityNames.length < options.nEntities) {
-                    resolve(entityNames);
+                if (subtopicNames.length < options.nSubtopics) {
+                    resolve(subtopicNames);
                 }
-                resolve(entityNames.slice(0, options.nEntities));
+                resolve(subtopicNames.slice(0, options.nSubtopics));
             } catch (err) {
                 reject(err);
             }
@@ -82,5 +82,5 @@ const getEntities = async (options) => {
 };
 
 module.exports = {
-    getEntities: getEntities
+    getSubtopics: getSubtopics
 };

@@ -2,7 +2,7 @@ const express = require('express');
 
 const { getArticleIds } = require('../services/aylienApi/getArticleIds');
 const { getArticlesById } = require('../services/aylienApi/getArticlesById');
-const { getEntities } = require('../services/aylienApi/getEntities');
+const { getSubtopics } = require('../services/aylienApi/getSubtopics');
 
 const { auth } = require('../middleware/auth');
 
@@ -42,14 +42,14 @@ router.get('/articlesById', auth, async (req, res) => {
     }
 });
 
-router.get('/entities', auth, async (req, res) => {
+router.get('/subtopics', auth, async (req, res) => {
     try {
-        const entities = await getEntities(req.body);
+        const subtopics = await getSubtopics(req.body);
 
-        if (entities.length === 0) {
+        if (subtopics.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
         } else {
-            res.status(200).send(entities);
+            res.status(200).send(subtopics);
         }
     } catch (err) {
         res.status(400).send(err);
