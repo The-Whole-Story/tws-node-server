@@ -15,15 +15,14 @@ const apiInstance = new AylienNewsApi.DefaultApi();
 const getSubtopics = async (options) => {
     let opts = {
         language: ['en'],
-        sort_by: 'recency'
+        sort_by: 'recency',
+        perPage: 100
     };
 
-    let subtopicsToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal'];
+    let subtopicsToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal', 'virus'];
 
-    if (options.nSubtopics === undefined || options.nSubtopics < 1) {
-        throw new Error('nSubtopics must be > 0');
-    } else {
-        opts.perPage = options.nSubtopics;
+    if (options.nResults === undefined || options.nResults < 1) {
+        throw new Error('nResults must be > 0');
     }
 
     if (options.topic !== undefined) {
@@ -70,10 +69,10 @@ const getSubtopics = async (options) => {
                     return 0;
                 });
 
-                if (subtopicNames.length < options.nSubtopics) {
+                if (subtopicNames.length < options.nResults) {
                     resolve(subtopicNames);
                 }
-                resolve(subtopicNames.slice(0, options.nSubtopics));
+                resolve(subtopicNames.slice(0, options.nResults));
             } catch (err) {
                 reject(err);
             }

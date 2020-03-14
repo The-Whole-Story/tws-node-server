@@ -13,6 +13,9 @@ app_key.apiKey = process.env.AYLIEN_KEY;
 const apiInstance = new AylienNewsApi.DefaultApi();
 
 const getArticlesById = async (ids) => {
+    if (ids.length < 1 || ids.length > 100) {
+        throw new Error('nArticles must be within 1 and 100, both inclusive');
+    }
     let opts = {
         language: ['en'],
         sort_by: 'recency',
