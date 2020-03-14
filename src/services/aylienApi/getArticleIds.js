@@ -32,9 +32,7 @@ const getArticleIds = async (options) => {
         sort_by: 'recency'
     };
 
-    let articleIds;
-
-    if (options.nArticles < 1 || options.nArticles > 100) {
+    if (options.nArticles === undefined || options.nArticles < 1 || options.nArticles > 100) {
         throw new Error('nArticles must be within 1 and 100, both inclusive');
     } else {
         opts.perPage = options.nArticles;
@@ -42,31 +40,32 @@ const getArticleIds = async (options) => {
     if (options.query !== undefined) {
         opts.text = options.query;
     }
+    if (options.filter !== undefined) {
+        //if there is a filter provided
+        if (options.filter.toLowerCase() === 'positive') {
+            opts.sentimentBodyPolarity = 'positive';
+            opts.notSentimentTitlePolarity = 'negative';
+        } else if (options.filter.toLowerCase() === 'political') {
+            opts.categoriesTaxonomy = 'iptc-subjectcode';
+            opts.categoriesId = ['06004000', '11000000', '11024000'];
+        } else if (options.filter.toLowerCase() === 'local') {
+            if (options.lat === undefined || options.long === undefined) {
+                throw new Error('If attempting to access local news, lat and long must be provided in request body');
+            }
+            const geoData = reverse.lookup(options.lat, options.long, 'us');
 
-    if (options.filter.toLowerCase() === 'positive') {
-        opts.sentimentBodyPolarity = 'positive';
-        opts.notSentimentTitlePolarity = 'negative';
-    } else if (options.filter.toLowerCase() === 'political') {
-        opts.categoriesTaxonomy = 'iptc-subjectcode';
-        opts.categoriesId = ['06004000', '11000000', '11024000'];
-    } else if (options.filter.toLowerCase() === 'local') {
-        if (options.lat === undefined || options.long === undefined) {
-            throw new Error('If attempting to access local news, lat and long must be provided in request body');
+            opts.sourceScopesCity = [geoData.city];
+            opts.sourceScopesState = [geoData.state];
+
+            let articleIds = await getIds(opts);
+            if (articleIds.length !== 0) {
+                return articleIds;
+            }
+            delete opts.sourceScopesCity;
         }
-        const geoData = reverse.lookup(options.lat, options.long, 'us');
-
-        opts.sourceScopesCity = [geoData.city];
-        opts.sourceScopesState = [geoData.state];
-
-        articleIds = await getIds(opts);
-        if (articleIds.length !== 0) {
-            return articleIds;
-        }
-        delete opts.sourceScopesCity;
     }
 
     return await getIds(opts);
-
 };
 
 module.exports = {

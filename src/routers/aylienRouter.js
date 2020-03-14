@@ -43,7 +43,6 @@ router.get('/articlesById', auth, async (req, res) => {
     }
 });
 
-
 router.get('/entities/:query/:nEntities', auth, async (req, res) => {
     try {
         if (req.params.nEntities < 1) {
