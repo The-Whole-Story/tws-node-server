@@ -29,10 +29,13 @@ const getSubtopics = async (options) => {
         opts.text = options.topic;
         subtopicsToAvoid = [...subtopicsToAvoid, ...options.topic.toLowerCase().split(' ')];
     }
-    //if there is a filter provided
-    if (options.filter.toLowerCase() === 'political') {
-        opts.categoriesTaxonomy = 'iptc-subjectcode';
-        opts.categoriesId = ['06004000', '11000000', '11024000'];
+
+    if (options.filter !== undefined) {
+        //if there is a filter provided
+        if (options.filter.toLowerCase() === 'political') {
+            opts.categoriesTaxonomy = 'iptc-subjectcode';
+            opts.categoriesId = ['06004000', '11000000', '11024000'];
+        }
     }
 
     let subtopics = {};
