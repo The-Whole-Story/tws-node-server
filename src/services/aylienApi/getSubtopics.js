@@ -26,16 +26,13 @@ const getSubtopics = async (options) => {
     }
 
     if (options.topic !== undefined) {
-        opts.text = options.topic;
+        opts.text = options.topic.replace(' ', '&&');
         subtopicsToAvoid = [...subtopicsToAvoid, ...options.topic.toLowerCase().split(' ')];
     }
 
     if (options.filter !== undefined) {
         //if there is a filter provided
-        if (options.filter.toLowerCase() === 'positive') {
-            opts.sentimentBodyPolarity = 'positive';
-            opts.notSentimentTitlePolarity = 'negative';
-        } else if (options.filter.toLowerCase() === 'political') {
+        if (options.filter.toLowerCase() === 'political') {
             opts.categoriesTaxonomy = 'iptc-subjectcode';
             opts.categoriesId = ['06004000', '11000000', '11024000'];
         }

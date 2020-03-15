@@ -43,7 +43,7 @@ const getArticlesById = async (ids) => {
                     return obj;
                 });
                 resolve(articles);
-            } catch (errr) {
+            } catch (err) {
                 reject(err);
             }
         });

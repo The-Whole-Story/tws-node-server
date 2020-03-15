@@ -8,9 +8,9 @@ const { auth } = require('../middleware/auth');
 
 const router = new express.Router();
 
-router.post('/articleIds', auth, async (req, res) => {
+router.get('/articleIds', auth, async (req, res) => {
     try {
-        const articleIds = await getArticleIds(req.body);
+        const articleIds = await getArticleIds(req.query);
 
         if (articleIds.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
@@ -22,9 +22,10 @@ router.post('/articleIds', auth, async (req, res) => {
     }
 });
 
-router.post('/articlesById', auth, async (req, res) => {
+router.get('/articlesById', auth, async (req, res) => {
     try {
-        const articles = await getArticlesById(req.body.ids);
+        const ids = Object.values(req.query).map(id => parseInt(id))
+        const articles = await getArticlesById(ids);
         if (articles.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
         } else {
@@ -35,9 +36,9 @@ router.post('/articlesById', auth, async (req, res) => {
     }
 });
 
-router.post('/subtopics', auth, async (req, res) => {
+router.get('/subtopics', auth, async (req, res) => {
     try {
-        const subtopics = await getSubtopics(req.body);
+        const subtopics = await getSubtopics(req.query);
 
         if (subtopics.length === 0) {
             res.status(404).send({ error: 'search brought no results' });
