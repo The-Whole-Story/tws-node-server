@@ -26,7 +26,7 @@ const getSubtopics = async (options) => {
     }
 
     if (options.topic !== undefined) {
-        opts.text = options.topic;
+        opts.text = options.topic.replace(' ', '&&');
         subtopicsToAvoid = [...subtopicsToAvoid, ...options.topic.toLowerCase().split(' ')];
     }
 
