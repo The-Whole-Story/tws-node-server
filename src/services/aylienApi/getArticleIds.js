@@ -27,9 +27,21 @@ const getIds = async (opts) => {
 };
 
 const getArticleIds = async (options) => {
+    const sources = [
+        'BBC',
+        'The Washington Post',
+        'Wall Street Journal',
+        'National Review',
+        'The Economist',
+        'The New York Times',
+        'The Los Angeles Times',
+        'Weekly Standard'
+    ];
+
     let opts = {
         language: ['en'],
-        sort_by: 'recency'
+        sort_by: 'recency',
+        sourceName: sources
     };
 
     if (options.nResults === undefined || options.nResults < 1 || options.nResults > 100) {
