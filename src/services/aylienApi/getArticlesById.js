@@ -31,7 +31,7 @@ const getArticlesById = async (ids) => {
                         articleId: story.id,
                         title: story.title,
                         author: story.author.name,
-                        body: story.body,
+                        body: story.body.split('\n').filter(s => s ? true : false),
                         source: {
                             name: story.source.name,
                             domain: story.source.domain
