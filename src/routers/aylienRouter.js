@@ -60,7 +60,6 @@ router.get('/summary', auth, async (req, res) => {
             res.status(200).send(summary);
         }
     } catch (err) {
-        console.log(err)
         res.status(400).send(err);
     }
 });

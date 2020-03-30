@@ -47,12 +47,15 @@ const getSubtopics = async (options) => {
                     story.entities.body.forEach((elem) => {
                         //if an individual word in a keyword element is in the subtopicsToAvoid array, then do not add it to the subtopic array
                         if (!elem.text.split(' ').some((word) => subtopicsToAvoid.indexOf(word.toLowerCase()) >= 0)) {
-                            subtopics[elem.text.toLowerCase()] === undefined
-                                ? (subtopics[elem.text.toLowerCase()] = 1)
-                                : subtopics[elem.text.toLowerCase()]++;
+                            if (subtopics[elem.text.toLowerCase()] === undefined) {
+                                subtopics[elem.text.toLowerCase()] = { count: 1, summary: story.summary.sentences[0] };
+                            } else {
+                                subtopics[elem.text.toLowerCase()]['count']++;
+                            }
                         }
                     });
                 });
+
 
                 let subtopicNames = Object.keys(subtopics);
                 subtopicNames.sort((a, b) => {
@@ -66,10 +69,17 @@ const getSubtopics = async (options) => {
                     return 0;
                 });
 
+                let subtopicsWithSummaries = subtopicNames.map((name) => {
+                    let obj = {};
+                    obj[name] = subtopics[name];
+                    return obj;
+                });
+
                 if (subtopicNames.length < options.nResults) {
-                    resolve(subtopicNames);
+                    resolve(subtopicsWithSummaries);
                 }
-                resolve(subtopicNames.slice(0, options.nResults));
+                console.log(subtopicsWithSummaries.slice(0, options.nResults))
+                resolve(subtopicsWithSummaries.slice(0, options.nResults));
             } catch (err) {
                 reject(err);
             }
