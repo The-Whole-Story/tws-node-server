@@ -18,7 +18,7 @@ const getIds = async (opts) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
                 const articleIds = data.stories.map((story) => story.id);
-                resolve(data.stories);
+                resolve(articleIds);
             } catch (err) {
                 reject(err);
             }
@@ -42,7 +42,7 @@ const getArticleIds = async (options) => {
         language: ['en'],
         sort_by: 'recency',
         sourceName: sources,
-        return: "id"
+        _return: ['id']
     };
 
     if (options.nResults === undefined || options.nResults < 1 || options.nResults > 100) {
