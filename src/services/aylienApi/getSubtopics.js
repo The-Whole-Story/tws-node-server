@@ -16,7 +16,8 @@ const getSubtopics = async (options) => {
     let opts = {
         language: ['en'],
         sort_by: 'recency',
-        perPage: 100
+        perPage: 100,
+        _return: ['entities']
     };
 
     let subtopicsToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal', 'virus'];

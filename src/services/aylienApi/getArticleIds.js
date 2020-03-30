@@ -41,7 +41,8 @@ const getArticleIds = async (options) => {
     let opts = {
         language: ['en'],
         sort_by: 'recency',
-        sourceName: sources
+        sourceName: sources,
+        _return: ['id']
     };
 
     if (options.nResults === undefined || options.nResults < 1 || options.nResults > 100) {

@@ -20,7 +20,8 @@ const getArticlesById = async (ids) => {
         language: ['en'],
         sort_by: 'recency',
         id: ids,
-        perPage: ids.length
+        perPage: ids.length,
+        _return: ["id", "title", "author", "body", "source", "links", "published_at", "keywords"]
     };
 
     return await new Promise((resolve, reject) => {
