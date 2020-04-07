@@ -1,4 +1,4 @@
-const findCategoryIPTC = (id) => {
+const getCategoryIPTC = (id) => {
     const iptcCategories = require('../services/iptcCategories.json');
 
     for (let i = 0; i < iptcCategories.length; i++) {
@@ -9,7 +9,7 @@ const findCategoryIPTC = (id) => {
     throw 'ID not found in IPTC categories';
 };
 
-const findCategoryIABQAG = (id) => {
+const getCategoryIABQAG = (id) => {
     const iabqagCategories = require('./iabqagCategories.json');
 
     for (let i = 0; i < iabqagCategories.length; i++) {
@@ -22,6 +22,6 @@ const findCategoryIABQAG = (id) => {
 };
 
 module.exports = {
-    findCategoryIPTC: findCategoryIPTC,
-    findCategoryIABQAG: findCategoryIABQAG,
+    getCategoryIPTC: getCategoryIPTC,
+    getCategoryIABQAG: getCategoryIABQAG,
 };
