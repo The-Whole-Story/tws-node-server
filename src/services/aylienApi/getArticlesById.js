@@ -24,6 +24,12 @@ const removeImageCaption = (body) => {
     }
 };
 
+const removeFollowPlug = (body) => {
+    if (body[body.length - 1].trim().substring(0, 10) == 'Follow BBC' && body[body.length - 1].includes('Instagram')) {
+        body.splice(body.length - 1, 1);
+    }
+};
+
 const getArticles = async (opts) => {
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
@@ -33,6 +39,7 @@ const getArticles = async (opts) => {
                     //body has split upon new lines and removed paragraphs that have no text
                     removeImageCaption(body);
                     //removes image caption
+                    removeFollowPlug(body);
 
                     let obj = {
                         articleId: story.id,
