@@ -69,8 +69,7 @@ const getArticlesById = async (ids) => {
         _return: ['id', 'title', 'author', 'body', 'source', 'links', 'published_at', 'keywords'],
     };
 
-    articles = getArticles(opts);
-    return articles;
+    return getArticles(opts);
 };
 
 module.exports = {
