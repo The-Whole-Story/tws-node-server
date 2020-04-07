@@ -17,7 +17,16 @@ const getIds = async (opts) => {
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
-                const articleIds = data.stories.map((story) => story.id);
+                const articles = data.stories.filter((story) => {
+                    let body = story.body.split('\n'); //splits a story on a newline
+                    if (body[body.length - 1].includes('...')) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+
+                const articleIds = articles.map((article) => article.id);
                 resolve(articleIds);
             } catch (err) {
                 reject(err);
@@ -30,19 +39,18 @@ const getArticleIds = async (options) => {
     const sources = [
         'BBC',
         'The Washington Post',
-        'Wall Street Journal',
         'National Review',
         'The Economist',
         'The New York Times',
         'The Los Angeles Times',
-        'Weekly Standard'
+        'Weekly Standard',
     ];
 
     let opts = {
         language: ['en'],
         sort_by: 'recency',
         sourceName: sources,
-        _return: ['id']
+        _return: ['body', 'id'],
     };
 
     if (options.nResults === undefined || options.nResults < 1 || options.nResults > 100) {
@@ -77,10 +85,15 @@ const getArticleIds = async (options) => {
             delete opts.sourceScopesCity;
         }
     }
-
-    return await getIds(opts);
+    let resultArticles = [];
+    while (resultArticles.length < parseInt(options.nResults, 10)) {
+        opts.perPage = '' + (parseInt(options.nResults, 10) - resultArticles.length);
+        let temp = await getIds(opts);
+        resultArticles.push(...temp);
+    }
+    return resultArticles;
 };
 
 module.exports = {
-    getArticleIds: getArticleIds
+    getArticleIds: getArticleIds,
 };
