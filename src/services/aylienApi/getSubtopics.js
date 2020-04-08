@@ -2,6 +2,9 @@ const AylienNewsApi = require('aylien-news-api');
 const dotenv = require('dotenv');
 dotenv.config();
 
+const { getCategoryIPTC } = require('../getCategoryName');
+const { getCategoryIABQAG } = require('../getCategoryName');
+
 const defaultClient = AylienNewsApi.ApiClient.instance;
 
 const app_id = defaultClient.authentications['app_id'];
@@ -12,12 +15,65 @@ app_key.apiKey = process.env.AYLIEN_KEY;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
+let categoryOccurences = {};
+
+const getCategoryNames = (categories) => {
+    return categories.map((category) => {
+        if (category['taxonomy'] == 'iab-qag') {
+            return getCategoryIABQAG(category['id']);
+        } else if (category['taxonomy'] == 'iptc-subjectcode') {
+            return getCategoryIPTC(category['id']);
+        } else {
+            throw 'category taxonomy not found';
+        }
+    });
+};
+
+const addUnique = (arr, categoryNames) => {
+    updateCategoryOccurences(categoryNames);
+    if (arr === undefined || arr.length == 0) {
+        if (categoryNames !== undefined) {
+            return categoryNames;
+        } else {
+            return [];
+        }
+    }
+    for (let i = 0; i < categoryNames.length; i++) {
+        if (arr.indexOf(categoryNames[i]) === -1) {
+            arr.push(categoryNames[i]);
+        }
+    }
+};
+
+const updateCategoryOccurences = (categoryNames) => {
+    for (let i = 0; i < categoryNames.length; i++) {
+        if (categoryOccurences[categoryNames[i]] === undefined) {
+            categoryOccurences[categoryNames[i]] = 1;
+        } else {
+            categoryOccurences[categoryNames[i]]++;
+        }
+    }
+};
+
+const indexOfSubtopicInArray = (arr, text) => {
+    if (arr.length === 0) {
+        return -1;
+    }
+
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i]['name'] === text) {
+            return i;
+        }
+    }
+    return -1;
+};
+
 const getSubtopics = async (options) => {
     let opts = {
         language: ['en'],
         sort_by: 'recency',
         perPage: 100,
-        _return: ['entities']
+        _return: ['categories', 'entities'],
     };
 
     let subtopicsToAvoid = ['us', 'u.s', 'u.s.', 'united States', 'united', 'states', 'republican', 'liberal', 'virus'];
@@ -39,38 +95,70 @@ const getSubtopics = async (options) => {
         }
     }
 
-    let subtopics = {};
+    let subtopics = [];
 
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
                 data.stories.forEach((story) => {
+                    let categoryNames = getCategoryNames(story.categories);
+
                     story.entities.body.forEach((elem) => {
                         //if an individual word in a keyword element is in the subtopicsToAvoid array, then do not add it to the subtopic array
                         if (!elem.text.split(' ').some((word) => subtopicsToAvoid.indexOf(word.toLowerCase()) >= 0)) {
-                            subtopics[elem.text.toLowerCase()] === undefined
-                                ? (subtopics[elem.text.toLowerCase()] = 1)
-                                : subtopics[elem.text.toLowerCase()]++;
+                            let index = indexOfSubtopicInArray(subtopics, elem.text.toLowerCase());
+                            if (index !== -1) {
+                                subtopics[index]['count']++;
+                                addUnique(subtopics[index]['categories'], categoryNames);
+                            } else {
+                                subtopics.push({
+                                    name: elem.text.toLowerCase(),
+                                    count: 1,
+                                    categories: categoryNames,
+                                });
+                            }
                         }
                     });
                 });
 
-                let subtopicNames = Object.keys(subtopics);
-                subtopicNames.sort((a, b) => {
-                    if (subtopics[a] > subtopics[b]) {
+                subtopics = subtopics.sort((a, b) => {
+                    if (a['count'] > b['count']) {
                         //if the subtopic at a has more occurances, put a first
                         return -1;
                     }
-                    if (subtopics[a] < subtopics[b]) {
+                    if (a['count'] < b['count']) {
                         return 1;
                     }
                     return 0;
                 });
 
-                if (subtopicNames.length < options.nResults) {
-                    resolve(subtopicNames);
+                if (subtopics.length < options.nResults) {
+                    for (let i = 0; i < subtopics.length; i++) {
+                        delete subtopics[i]['count'];
+                        subtopics[i]['categories'].sort((a, b) => {
+                            if (categoryOccurences[a] > categoryOccurences[b]) {
+                                return -1;
+                            } else if (categoryOccurences[a] < categoryOccurences[b]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                    }
+                    resolve(subtopics);
+                } else {
+                    for (let i = 0; i < options.nResults; i++) {
+                        delete subtopics[i]['count'];
+                        subtopics[i]['categories'].sort((a, b) => {
+                            if (categoryOccurences[a] > categoryOccurences[b]) {
+                                return -1;
+                            } else if (categoryOccurences[a] < categoryOccurences[b]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                    }
+                    resolve(subtopics.slice(0, options.nResults));
                 }
-                resolve(subtopicNames.slice(0, options.nResults));
             } catch (err) {
                 reject(err);
             }
@@ -79,5 +167,5 @@ const getSubtopics = async (options) => {
 };
 
 module.exports = {
-    getSubtopics: getSubtopics
+    getSubtopics: getSubtopics,
 };
