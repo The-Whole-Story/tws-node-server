@@ -15,6 +15,8 @@ app_key.apiKey = process.env.AYLIEN_KEY;
 
 const apiInstance = new AylienNewsApi.DefaultApi();
 
+let categoryOccurences = {};
+
 const getCategoryNames = (categories) => {
     return categories.map((category) => {
         if (category['taxonomy'] == 'iab-qag') {
@@ -28,12 +30,27 @@ const getCategoryNames = (categories) => {
 };
 
 const addUnique = (arr, categoryNames) => {
+    updateCategoryOccurences(categoryNames);
     if (arr === undefined || arr.length == 0) {
-        return [];
+        if (categoryNames !== undefined) {
+            return categoryNames;
+        } else {
+            return [];
+        }
     }
     for (let i = 0; i < categoryNames.length; i++) {
         if (arr.indexOf(categoryNames[i]) === -1) {
             arr.push(categoryNames[i]);
+        }
+    }
+};
+
+const updateCategoryOccurences = (categoryNames) => {
+    for (let i = 0; i < categoryNames.length; i++) {
+        if (categoryOccurences[categoryNames[i]] === undefined) {
+            categoryOccurences[categoryNames[i]] = 1;
+        } else {
+            categoryOccurences[categoryNames[i]]++;
         }
     }
 };
@@ -55,7 +72,7 @@ const getSubtopics = async (options) => {
     let opts = {
         language: ['en'],
         sort_by: 'recency',
-        perPage: 100, //TODO CHANGE BACK TO 100
+        perPage: 100,
         _return: ['categories', 'entities'],
     };
 
@@ -116,9 +133,32 @@ const getSubtopics = async (options) => {
                 });
 
                 if (subtopics.length < options.nResults) {
+                    for (let i = 0; i < subtopics.length; i++) {
+                        delete subtopics[i]['count'];
+                        subtopics[i]['categories'].sort((a, b) => {
+                            if (categoryOccurences[a] > categoryOccurences[b]) {
+                                return -1;
+                            } else if (categoryOccurences[a] < categoryOccurences[b]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                    }
                     resolve(subtopics);
+                } else {
+                    for (let i = 0; i < options.nResults; i++) {
+                        delete subtopics[i]['count'];
+                        subtopics[i]['categories'].sort((a, b) => {
+                            if (categoryOccurences[a] > categoryOccurences[b]) {
+                                return -1;
+                            } else if (categoryOccurences[a] < categoryOccurences[b]) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                    }
+                    resolve(subtopics.slice(0, options.nResults));
                 }
-                resolve(subtopics.slice(0, options.nResults));
             } catch (err) {
                 reject(err);
             }
