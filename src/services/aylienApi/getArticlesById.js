@@ -16,9 +16,19 @@ const isEmpty = (str) => {
     return str.length === 0 || !str.trim();
 };
 
+const removeMediaPlayBackHeader = (body) => {
+    if (body[0] == 'Media playback is unsupported on your device') {
+        body.splice(0, 1);
+        let index = body[0].indexOf('Media caption');
+        if (index !== -1) {
+            body[0] = body[0].substring(index + 13);
+        }
+    }
+};
+
 const removeImageCaption = (body) => {
     for (let i = 0; i < body.length; i++) {
-        if (body[i] == 'Image copyright') {
+        if (body[i].trim() == 'Image copyright') {
             body.splice(i, 4);
         }
     }
@@ -34,9 +44,12 @@ const getArticles = async (opts) => {
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
+                console.log(data.stories);
                 const articles = data.stories.map((story) => {
                     let body = story.body.split('\n').filter((s) => (!isEmpty(s) ? true : false));
                     //body has split upon new lines and removed paragraphs that have no text
+                    removeMediaPlayBackHeader(body);
+
                     removeImageCaption(body);
                     //removes image caption
                     removeFollowPlug(body);
