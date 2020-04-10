@@ -44,9 +44,9 @@ const getArticles = async (opts) => {
     return await new Promise((resolve, reject) => {
         apiInstance.listStories(opts, (error, data, response) => {
             try {
-                console.log(data.stories);
                 const articles = data.stories.map((story) => {
                     let body = story.body.split('\n').filter((s) => (!isEmpty(s) ? true : false));
+                    body = body.map((str) => str.replace(/[^\x00-\x7F]/g, ''));
                     //body has split upon new lines and removed paragraphs that have no text
                     removeMediaPlayBackHeader(body);
 
